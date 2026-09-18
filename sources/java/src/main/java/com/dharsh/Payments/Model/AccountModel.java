@@ -22,6 +22,7 @@ public class AccountModel {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     private String accountNumber;
+    //private String CraccountNumber;
     private BigDecimal balance;
     private String currency;
     @Enumerated(EnumType.STRING)
