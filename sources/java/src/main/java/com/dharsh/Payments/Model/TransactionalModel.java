@@ -32,10 +32,10 @@ public class TransactionalModel {
     private TransactionalStatus transactionalStatus;
 
     @ManyToOne 
-    private AccountModel senderAccountID;
+    private AccountModel senderAccount;
 
     @ManyToOne
-    private AccountModel receiverAccountID;
+    private AccountModel receiverAccount;
     
     @NotNull 
     private Date createdAt;

@@ -43,14 +43,14 @@ public class AccountController {
     }
     
     @PostMapping("/depositAmount/{accountId}")
-    public ResponseEntity<String> depositeAmount(@RequestBody AmountDeposit request, @PathVariable Long accountId)
+    public ResponseEntity<String> depositeAmount(@Valid @RequestBody AmountDeposit request, @Valid  @PathVariable Long accountId)
     {
         accountService.depositAmount(request, accountId);
         return new ResponseEntity<>("Amount deposited Successfully",HttpStatus.OK);
     }
 
     @PostMapping("/withdrawAmount/{accountId}")
-    public ResponseEntity<String> withdrawAmount(@RequestBody AmountWithdrawal request, @PathVariable Long accountId)
+    public ResponseEntity<String> withdrawAmount(@Valid @RequestBody AmountWithdrawal request, @Valid @PathVariable Long accountId)
     {
         accountService.withdrawAmount(request,accountId);
         return new ResponseEntity<>("Amount debited Successfully",HttpStatus.OK);

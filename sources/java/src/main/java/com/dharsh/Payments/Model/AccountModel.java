@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Version;
 import lombok.Data;
 
 @Data
@@ -32,5 +33,8 @@ public class AccountModel {
     @ManyToOne
     @JoinColumn(name="customer_id", nullable=false)
     private CustomerModel customer;
+
+    @Version 
+    private Long version;
     
 }

@@ -13,10 +13,6 @@ public class AmountWithdrawal {
     @DecimalMax (value="15000.00" , message="Amount must be less than or equal to 15000")
     private BigDecimal amount;
 
-    @NotNull 
-    private String ReceiverAccountNumber;
-    
-    @NotNull 
-    private String SenderAccountNumber;
+
     
 }

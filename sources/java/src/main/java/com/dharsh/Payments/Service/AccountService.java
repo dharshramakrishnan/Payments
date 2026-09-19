@@ -107,10 +107,10 @@ public class AccountService {
         txn.setAmount(request.getAmount());
         txn.setTransactionType(TransactionType.DEPOSIT);
         txn.setTransactionalStatus(TransactionalStatus.SUCCESS);
-        txn.setSenderAccountID(account);
-        //txn.setReceiverAccountID(account);
-        txn.setSenderAccountNumber(request.getSenderAccountNumber());
-        txn.setReceiverAccountNumber(request.getReceiverAccountNumber());
+        //txn.setSenderAccountID(account);
+        txn.setReceiverAccount(account);
+        //txn.setSenderAccountNumber(request.getSenderAccountNumber());
+        txn.setReceiverAccountNumber(account.getAccountNumber());
         txn.setCreatedAt(new Date());
 
         txnRepo.save(txn);
@@ -136,6 +136,7 @@ public class AccountService {
 
         }
 
+
         account.setBalance(account.getBalance().subtract(request.getAmount()));
         accountRepo.save(account);
 
@@ -147,8 +148,8 @@ public class AccountService {
         txn.setAmount(request.getAmount());
         txn.setTransactionType(TransactionType.WITHDRAWAL);
         txn.setTransactionalStatus(TransactionalStatus.SUCCESS);
-        txn.setSenderAccountID(account);
-        txn.setSenderAccountNumber(request.getSenderAccountNumber());
+        txn.setSenderAccount(account);
+        txn.setSenderAccountNumber(account.getAccountNumber());
         //txn.setReceiverAccount(account);
         txn.setCreatedAt(new Date());
 
