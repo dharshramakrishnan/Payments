@@ -9,7 +9,7 @@ import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
+
 
 
 import com.dharsh.Payments.DTOs.AccountStatusOperation;
@@ -17,7 +17,7 @@ import com.dharsh.Payments.DTOs.AmountDeposit;
 import com.dharsh.Payments.DTOs.AmountWithdrawal;
 import com.dharsh.Payments.DTOs.CreateAccountRequests;
 import com.dharsh.Payments.Exceptions.AccountNotFoundException;
-import com.dharsh.Payments.Exceptions.AccountNotFoundException;
+
 import com.dharsh.Payments.Exceptions.CustomerNotFoundException;
 import com.dharsh.Payments.Model.AccountModel;
 import com.dharsh.Payments.Model.AccountStatus;
