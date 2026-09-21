@@ -3,6 +3,7 @@ package com.dharsh.Payments.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.management.RuntimeErrorException;
@@ -101,14 +102,24 @@ public class TransactionService {
     @Transactional
     public void transferAmount(String IdempotencyKey, TransferAmount request)
     {
-        Idempotency idempotency=idempotencyRepo.findByIdempotencyKey(IdempotencyKey).get();
+        Optional<Idempotency> idempotency=idempotencyRepo.findByIdempotencyKey(IdempotencyKey);
         //.orElseThrow(()-> new TransactionAlreadyProcessedException("The transaction is processed already"));
-        if(idempotency.getIdempotencyKey()==null)
-        {
+
+    if(idempotency.isPresent())
+    {
+        throw new TransactionAlreadyProcessedException("Transaction already processed");
+    }
+       
         Idempotency idmptncy=new Idempotency();
         AccountModel debit_acnt_dtls=accountRepo.findByAccountNumber(request.getSenderAccountNumber()).orElseThrow( ()-> new AccountNotFoundException("Account" +request.getSenderAccountNumber()+"does not exists"));
         AccountModel credit_acnt_dtls=accountRepo.findByAccountNumber(request.getReceiverAccountNumber()).orElseThrow(()-> new AccountNotFoundException("Account" + request.getReceiverAccountNumber()+"does not exists"));
         
+
+         idmptncy.setIdempotencyKey(IdempotencyKey);
+         idmptncy.setCreatedAt(new Date());
+         idempotencyRepo.saveAndFlush(idmptncy);
+
+
         if(debit_acnt_dtls.getStatus()==AccountStatus.BLOCKED || debit_acnt_dtls.getStatus()==AccountStatus.CLOSED)
         {
             throw new IllegalStateException(" Debit Account is blocked or closed");
@@ -149,18 +160,15 @@ public class TransactionService {
         //accountRepo.save(credit_acnt_dtls);
         transactionRepo.save(movement);
        // throw new RuntimeException("Testing Transactional RollBack");
-       idmptncy.setIdempotencyKey(IdempotencyKey);
+     
        idmptncy.setTransactionId(movement.getTransactionID());
-       idmptncy.setCreatedAt(new Date());
+       
 
-       idempotencyRepo.save(idmptncy);
+      
 
 
-    }
-    else
-    {
-        throw new TransactionAlreadyProcessedException("Transaction already processed");
-    }
+    
+   
 
         
 
