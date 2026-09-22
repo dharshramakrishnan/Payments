@@ -11,4 +11,5 @@ import com.dharsh.Payments.Model.Idempotency;
 public interface IdempotencyRepo extends JpaRepository<Idempotency,Integer> {
     
     Optional<Idempotency> findByIdempotencyKey(String idempotencyKey);
+    Optional<Idempotency> findByTransactionId(String TransactionId);
 }

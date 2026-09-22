@@ -3,6 +3,7 @@ package com.dharsh.Payments.Model;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,8 +21,9 @@ public class TransactionalModel {
     @Id 
     @GeneratedValue (strategy=GenerationType.IDENTITY)
     private int id;
-
-    private String TransactionID;
+    
+    @Column(name = "transactionid")
+    private String transactionId;
 
     private BigDecimal amount;
 

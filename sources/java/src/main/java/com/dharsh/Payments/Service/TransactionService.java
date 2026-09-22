@@ -48,7 +48,7 @@ public class TransactionService {
  
                 TransactionHistory txn_hstry=new TransactionHistory();
                  txn_hstry.setId(txn.getId());
-                 txn_hstry.setTransactionID(txn.getTransactionID());
+                 txn_hstry.setTransactionID(txn.getTransactionId());
                  txn_hstry.setTransactionStatus(txn.getTransactionalStatus().toString());
                  txn_hstry.setTransactionType(txn.getTransactionType().toString());
                  txn_hstry.setReceiverAccountNumber(txn.getReceiverAccountNumber());
@@ -71,7 +71,7 @@ public class TransactionService {
             if(txn.getReceiverAccount() !=null && txn.getReceiverAccount().getId().equals(accountId))
             {
                  txn_hstry.setId(txn.getId());
-                 txn_hstry.setTransactionID(txn.getTransactionID());
+                 txn_hstry.setTransactionID(txn.getTransactionId());
                  txn_hstry.setTransactionStatus(txn.getTransactionalStatus().toString());
                  txn_hstry.setTransactionType(txn.getTransactionType().toString());
                  txn_hstry.setReceiverAccountNumber(txn.getReceiverAccountNumber());
@@ -83,7 +83,7 @@ public class TransactionService {
             if(txn.getSenderAccount() !=null && txn.getSenderAccount().getId().equals(accountId))
             {
                  txn_hstry.setId(txn.getId());
-                 txn_hstry.setTransactionID(txn.getTransactionID());
+                 txn_hstry.setTransactionID(txn.getTransactionId());
                  txn_hstry.setTransactionStatus(txn.getTransactionalStatus().toString());
                  txn_hstry.setTransactionType(txn.getTransactionType().toString());
                  txn_hstry.setSenderAccountNumber(txn.getSenderAccountNumber());
@@ -98,18 +98,40 @@ public class TransactionService {
 
         return transaction;
     }
+
+    public TransactionHistory ProcessTransactionHistory(String TransactionId)
+    {
+        Optional<TransactionalModel> txn=transactionRepo.findByTransactionId(TransactionId);
+
+        TransactionHistory txn_hst=new TransactionHistory();
+        TransactionalModel txn_mdl=txn.get();
+        txn_hst.setAmount(txn_mdl.getAmount());
+        txn_hst.setTransactionID(txn_mdl.getTransactionId());
+        txn_hst.setReceiverAccountNumber(txn_mdl.getReceiverAccountNumber());
+        txn_hst.setSenderAccountNumber(txn_mdl.getSenderAccountNumber());
+        txn_hst.setTransactionStatus(txn_mdl.getTransactionalStatus().toString());
+        txn_hst.setTransactionType(txn_mdl.getTransactionType().toString());
+        txn_hst.setTransactionTime(txn_mdl.getCreatedAt());
+        txn_hst.setId(txn_mdl.getId());
+
+        return txn_hst;
+
+
+
+    }
    
     @Transactional
-    public void transferAmount(String IdempotencyKey, TransferAmount request)
+    public TransactionHistory transferAmount(String IdempotencyKey, TransferAmount request)
     {
         Optional<Idempotency> idempotency=idempotencyRepo.findByIdempotencyKey(IdempotencyKey);
-        //.orElseThrow(()-> new TransactionAlreadyProcessedException("The transaction is processed already"));
 
-    if(idempotency.isPresent())
-    {
-        throw new TransactionAlreadyProcessedException("Transaction already processed");
-    }
-       
+        if(idempotency.isPresent())
+        {
+            Idempotency idmptcy=idempotency.get();
+            return ProcessTransactionHistory(idmptcy.getTransactionId());
+
+        }
+      
         Idempotency idmptncy=new Idempotency();
         AccountModel debit_acnt_dtls=accountRepo.findByAccountNumber(request.getSenderAccountNumber()).orElseThrow( ()-> new AccountNotFoundException("Account" +request.getSenderAccountNumber()+"does not exists"));
         AccountModel credit_acnt_dtls=accountRepo.findByAccountNumber(request.getReceiverAccountNumber()).orElseThrow(()-> new AccountNotFoundException("Account" + request.getReceiverAccountNumber()+"does not exists"));
@@ -146,7 +168,7 @@ public class TransactionService {
         
         //creating the movement
         TransactionalModel movement=new TransactionalModel();
-        movement.setTransactionID(UUID.randomUUID().toString());
+        movement.setTransactionId(UUID.randomUUID().toString());
         movement.setReceiverAccount(credit_acnt_dtls);
         movement.setSenderAccount(debit_acnt_dtls);
         movement.setReceiverAccountNumber(credit_acnt_dtls.getAccountNumber());
@@ -155,19 +177,29 @@ public class TransactionService {
         movement.setCreatedAt(new Date());
         movement.setTransactionType(TransactionType.TRANSFER);
         movement.setTransactionalStatus(TransactionalStatus.SUCCESS);
+
+        //returning the transaction details for successfull transfer
+        TransactionHistory txn_hst=new TransactionHistory();
+        txn_hst.setAmount(movement.getAmount());
+        txn_hst.setTransactionID(movement.getTransactionId());
+        txn_hst.setReceiverAccountNumber(movement.getReceiverAccountNumber());
+        txn_hst.setSenderAccountNumber(movement.getSenderAccountNumber());
+        txn_hst.setTransactionStatus(movement.getTransactionalStatus().toString());
+        txn_hst.setTransactionType(movement.getTransactionType().toString());
+        txn_hst.setTransactionTime(movement.getCreatedAt());
+        txn_hst.setId(movement.getId());
+        
     
         //accountRepo.save(debit_acnt_dtls);
         //accountRepo.save(credit_acnt_dtls);
         transactionRepo.save(movement);
        // throw new RuntimeException("Testing Transactional RollBack");
      
-       idmptncy.setTransactionId(movement.getTransactionID());
-       
-
+       idmptncy.setTransactionId(movement.getTransactionId());
       
 
 
-    
+    return txn_hst;
    
 
         

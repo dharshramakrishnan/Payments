@@ -38,10 +38,10 @@ public class TransactionController {
     }
 
     @PostMapping("/TranferAmount")
-    public ResponseEntity<String> transferAmount(@RequestHeader("Idempotency-key") String IdempotencyKey ,@Valid @RequestBody TransferAmount amount)
+    public ResponseEntity<TransactionHistory> transferAmount(@RequestHeader("Idempotency-key") String IdempotencyKey ,@Valid @RequestBody TransferAmount amount)
     {
-        transactionService.transferAmount(IdempotencyKey,amount);
-        return new ResponseEntity<>("Payment Successfull",HttpStatus.OK);
+        
+        return new ResponseEntity<>(transactionService.transferAmount(IdempotencyKey,amount),HttpStatus.OK);
     }
     
 }

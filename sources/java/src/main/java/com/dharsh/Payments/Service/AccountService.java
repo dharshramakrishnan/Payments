@@ -103,7 +103,7 @@ public class AccountService {
         //create a transaction record for the deposit operation
         TransactionalModel txn=new TransactionalModel();
 
-        txn.setTransactionID(UUID.randomUUID().toString());
+        txn.setTransactionId(UUID.randomUUID().toString());
         txn.setAmount(request.getAmount());
         txn.setTransactionType(TransactionType.DEPOSIT);
         txn.setTransactionalStatus(TransactionalStatus.SUCCESS);
@@ -144,7 +144,7 @@ public class AccountService {
         //create a transaction record for the Withdrawal  operation
         TransactionalModel txn=new TransactionalModel();
 
-        txn.setTransactionID(UUID.randomUUID().toString());
+        txn.setTransactionId(UUID.randomUUID().toString());
         txn.setAmount(request.getAmount());
         txn.setTransactionType(TransactionType.WITHDRAWAL);
         txn.setTransactionalStatus(TransactionalStatus.SUCCESS);
