@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -22,6 +23,7 @@ public class AccountModel {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
+    @Column (name="account_number")
     private String accountNumber;
     //private String CraccountNumber;
     private BigDecimal balance;
