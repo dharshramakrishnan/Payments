@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 import com.dharsh.Payments.DTOs.AccountStatusOperation;
 import com.dharsh.Payments.DTOs.AmountDeposit;
 import com.dharsh.Payments.DTOs.AmountWithdrawal;
+import com.dharsh.Payments.DTOs.CacheAccount;
 import com.dharsh.Payments.DTOs.CreateAccountRequests;
+import com.dharsh.Payments.DTOs.FetchAccountDtls;
 import com.dharsh.Payments.Exceptions.AccountNotFoundException;
 
 import com.dharsh.Payments.Exceptions.CustomerNotFoundException;
@@ -40,6 +42,9 @@ public class AccountService {
 
     @Autowired 
     private TransactionRepo txnRepo;
+
+    @Autowired 
+    private AccountCacheService acntCacheService;
 
 
     public void createAccount(CreateAccountRequests request)
@@ -154,6 +159,57 @@ public class AccountService {
         txn.setCreatedAt(new Date());
 
         txnRepo.save(txn);
+    }
+
+    public FetchAccountDtls getAccountByAccountNumber(String accountNumber)
+    {
+        FetchAccountDtls account=new FetchAccountDtls();
+        CacheAccount cache_acnt=acntCacheService.getCacheAccount(accountNumber);
+        if(cache_acnt!=null)
+        {
+            account.setAccountNumber(cache_acnt.getAccountNumber());
+            account.setAccountStatus(cache_acnt.getStatus().toString());
+            account.setBalance(cache_acnt.getBalance().toString());
+            account.setCurrency(cache_acnt.getCurrency());
+            account.setId(cache_acnt.getId().toString());
+
+            System.out.print("HIT");
+
+        }
+        else{
+             
+            Optional<AccountModel> acnt_model=accountRepo.findByAccountNumber(accountNumber);
+            
+
+            if(acnt_model.isPresent())
+            {
+                account.setAccountNumber(acnt_model.get().getAccountNumber());
+                account.setAccountStatus(acnt_model.get().getStatus().toString());
+                account.setBalance(acnt_model.get().getBalance().toString());
+                account.setCurrency(acnt_model.get().getCurrency());
+                account.setId(acnt_model.get().getId().toString());
+
+                CacheAccount cache_account=new CacheAccount();
+                cache_account.setAccountNumber(acnt_model.get().getAccountNumber());
+                cache_account.setBalance(acnt_model.get().getBalance());
+                cache_account.setCurrency(acnt_model.get().getCurrency());
+                cache_account.setId(acnt_model.get().getId());
+                cache_account.setStatus(acnt_model.get().getStatus());
+
+                acntCacheService.saveAccount(cache_account);
+
+                System.out.print("MISS");
+
+            }
+            else
+            {
+                throw new AccountNotFoundException("Account with account number : "+accountNumber+"  does not exists");
+            }
+             
+        }
+
+        
+        return account;
     }
 
     

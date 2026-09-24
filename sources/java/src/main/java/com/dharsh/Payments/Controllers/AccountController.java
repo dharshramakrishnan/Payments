@@ -2,8 +2,10 @@ package com.dharsh.Payments.Controllers;
 
 
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +19,7 @@ import com.dharsh.Payments.DTOs.AmountDeposit;
 import com.dharsh.Payments.DTOs.AmountWithdrawal;
 import com.dharsh.Payments.DTOs.CacheAccount;
 import com.dharsh.Payments.DTOs.CreateAccountRequests;
+import com.dharsh.Payments.DTOs.FetchAccountDtls;
 import com.dharsh.Payments.Exceptions.AccountNotFoundException;
 import com.dharsh.Payments.Model.AccountModel;
 import com.dharsh.Payments.Repositories.AccountRepo;
@@ -86,7 +89,27 @@ public class AccountController {
         
 
         return "Account cached successfully";
+    } 
+    
+    @GetMapping ("/getAccount/{accountNumber}")
+    public ResponseEntity<CacheAccount> getAccount(@PathVariable  String accountNumber)
+    {
+       
+       CacheAccount account=acntCacheService.getCacheAccount(accountNumber);
+        if (account == null) {
+        return ResponseEntity.notFound().build();
     }   
+
+    return ResponseEntity.ok(account);
+    }
+
+    @GetMapping ("/getAccountNumber/{accountNumber}")
+    public ResponseEntity<FetchAccountDtls> getAccountByAccountNumber(String accountNumber)
+    {
+        FetchAccountDtls acnt=accountService.getAccountByAccountNumber(accountNumber);
+
+        return ResponseEntity.ok(acnt);
+    }
 
     
 }
