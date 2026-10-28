@@ -19,11 +19,11 @@ pipeline {
 
         stage('Build and Test') {
             steps {
-                dir('sources/java') {
-                    sh 'java -version'
-                    sh 'mvn -version'
-                    sh 'mvn -B clean verify'
-                }
+                withEnv([
+                'SPRING_DATASOURCE_URL=jdbc:postgresql://payment-postgres:5432/payments_db'
+            ]){
+			 sh 'mvn -B clean verify'
+			}
             }
         }
     }
