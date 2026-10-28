@@ -1,0 +1,49 @@
+
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven-3'
+    }
+
+    options {
+        timestamps()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build and Test') {
+            steps {
+                dir('sources/java') {
+                    sh 'java -version'
+                    sh 'mvn -version'
+                    sh 'mvn -B clean verify'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            junit allowEmptyResults: true,
+                  testResults: '**/target/surefire-reports/TEST-*.xml'
+
+            archiveArtifacts artifacts: '**/target/*.jar',
+                             allowEmptyArchive: true,
+                             fingerprint: true
+        }
+
+        success {
+            echo 'Payments build and tests passed!'
+        }
+
+        failure {
+            echo 'Build failed. Check the console output.'
+        }
+    }
+}
