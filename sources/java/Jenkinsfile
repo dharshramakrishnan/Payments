@@ -19,6 +19,7 @@ pipeline {
 
         stage('Build and Test') {
             steps {
+			   dir('sources/java') {
                 withEnv([
                 'SPRING_DATASOURCE_URL=jdbc:postgresql://payment-postgres:5432/payments_db'
             ]){
